@@ -1,0 +1,139 @@
+package com.nav.spring;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+
+public class App {
+
+	public static void main(String[] args) {
+		
+		ApplicationContext context = new ClassPathXmlApplicationContext("com/caveofprogramming/spring/test/beans/beans.xml");
+		
+		Person person = (Person)context.getBean("person");
+		
+		person.setTaxId(666);
+
+		System.out.println(person);;
+
+		((ClassPathXmlApplicationContext)context).close();
+	}
+
+}
+===
+public class Person {
+	
+	private int id;
+	private String name;
+	private int taxId;
+	private Address address;
+	
+	public Person() {
+		
+	}
+	
+	public static Person getInstance(int id, String name) { //Static is important
+		System.out.println("Creating Person using factory method.");
+		return new Person(id, name);
+	}
+	
+	public Person(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+	
+	public void onCreate() {
+		System.out.println("Person created: " + this);
+	}
+	
+	public void onDestroy() {
+		System.out.println("Person destroyed.");
+	}
+
+	public void speak() {
+		System.out.println("Hello! I'm a person.");
+	}
+
+	public void setTaxId(int taxId) {
+		this.taxId = taxId;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	@Override
+	public String toString() {
+		return "Person [id=" + id + ", name=" + name + ", taxId=" + taxId
+				+ ", address=" + address + "]";
+	}
+}
+===
+
+public class Address {
+	private String street;
+	private String postcode;
+	
+	public Address(String street, String postcode) {
+		this.street = street;
+		this.postcode = postcode;
+	}
+	
+	public void init() {
+		System.out.println("Bean created: " + this);
+	}
+
+	@Override
+	public String toString() {
+		return "Address [street=" + street + ", postcode=" + postcode + "]";
+	}
+
+}
+===
+
+public class PersonFactory {
+	public Person createPerson(int id, String name) { //SHOULDNT BE STATIC
+		System.out.println("Using factory to create person.");
+		return new Person(id, name);
+	}
+}
+
+===
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-init-method="init" default-destroy-method="destroy">
+
+
+	<bean id="person" class="com.nav.spring.Person"
+		scope="singleton" init-method="onCreate" destroy-method="onDestroy"
+		factory-method="getInstance">
+		<constructor-arg value="777" name="id" type="int"> // CONSTRUCTOR ARGS will pass to factory method arg
+		</constructor-arg>
+		<constructor-arg value="Mary" name="name" type="String"></constructor-arg>
+		<property value="321" name="taxId">
+		</property>
+		<property name="address" ref="address"></property>
+	</bean>
+	
+	<bean id="person2" class="com.nav.spring.Person"
+		scope="singleton" init-method="onCreate" destroy-method="onDestroy"
+		factory-method="createPerson" factory-bean="personfactory"> // FACTORY METHOD IN CLASS.
+		<constructor-arg value="654" name="id" type="int">
+		</constructor-arg>
+		<constructor-arg value="Mike" name="name" type="String"></constructor-arg>
+		<property value="321" name="taxId">
+		</property>
+		<property name="address" ref="address"></property>
+	</bean>
+
+	<bean id="address" class="com.nav.spring.Address">
+		<constructor-arg name="street" value="1 Church Lane"></constructor-arg>
+		<constructor-arg name="postcode" value="9876"></constructor-arg>
+	</bean>
+
+	<bean id="personfactory" //PERSON FACTORY CLASS
+		class="com.nav.spring.PersonFactory">
+	</bean>
+</beans>

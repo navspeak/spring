@@ -1,0 +1,120 @@
+package com.nav.spring;
+
+public class Animal {
+	private String name;
+	private String type;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return "Animal [name=" + name + ", type=" + type + "]";
+	}
+}
+===
+package com.nav.spring;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Jungle {
+	
+	private Map<String, String> foods = new HashMap<String, String>();
+	private Map<String, Animal> animals = new HashMap<String, Animal>();
+	
+	public void setFoods(Map<String, String> foods) {
+		this.foods = foods;
+	}
+
+	public void setAnimals(Map<String, Animal> animals) {
+		this.animals = animals;
+	}
+
+	@Override
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for(Map.Entry<String, String> entry: foods.entrySet()) {
+			sb.append(entry.getKey() + ": " + entry.getValue() + "\n");
+		}
+		
+		sb.append("\n");
+		
+		for(Map.Entry<String, Animal> entry: animals.entrySet()) {
+			sb.append(entry.getKey() + ": " + entry.getValue() + "\n");
+		}
+		
+		return sb.toString();
+	}
+}
+===
+public class App {
+
+	public static void main(String[] args) {
+		
+		ApplicationContext context = new ClassPathXmlApplicationContext("com/caveofprogramming/spring/test/beans/beans.xml");
+		
+		Jungle jungle = (Jungle)context.getBean("jungle");
+		
+		System.out.println(jungle);
+		
+		((ClassPathXmlApplicationContext)context).close();
+	}
+
+}
+===
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="lion" class="com.nav.spring.Animal">
+		<property name="name" value="Igor"></property>
+		<property name="type" value="lion"></property>
+	</bean>
+	<bean id="elephant" class="com.nav.spring.Animal">
+		<property name="name" value="Richard"></property>
+		<property name="type" value="elephant"></property>
+	</bean>
+	<bean id="snake" class="com.nav.spring.Animal">
+		<property name="name" value="Bob"></property>
+		<property name="type" value="snake"></property>
+	</bean>
+
+	<bean id="jungle"
+		class="com.nav.spring.Jungle">
+
+		<property name="foods">
+			<props>
+				<prop key="gorilla">banana</prop>
+				<prop key="panda">bamboo</prop>
+				<prop key="snake">eggs</prop>
+			</props>
+		</property>
+
+		<property name="animals">
+			<map>
+				<entry key="lion" value-ref="lion"></entry>
+				<entry key="elephant" value-ref="elephant"></entry>
+				<entry key="snake" value-ref="snake"></entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

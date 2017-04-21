@@ -1,0 +1,129 @@
+Add Namespace: xmlns:context="http://www.springframework.org/schema/context"
+(A context tab will appear and then add following in beans.xml:)
+<context:annotation-config></context:annotation-config> 
+ => Tells spring to use annotation
+ 
+ ===========================
+ AutoWire Annotations
+ ===========================
+ 1. Native spring way
+ @Autowired on setters, instance private variables (you can have no setters and it will work) and also constructor
+ -Not very flexible, works by Type
+===========================
+Optional Beans @Autowired(required=false)
+===========================
+ I may want to inject a bean if it exists in beans.xml, if it doesn't I must not fail...
+ 
+ 	@Autowired(required=false) // if bean doesn't exist in xml it will not try to wire or inject.
+	public void setConsoleWriter(ConsoleWriter writer) {
+		this.consoleWriter = writer;
+	}
+
+===========================
+Qualifier Beans @Qualifier(value="someQualifierId")
+===========================	
+If there are two qualifying bean and we want one to be used or qualify for autowire. We can add a qualifier as:
+
+	<bean id="consoleWriter1" class="ConsoleWriter" init-method="anotherInit">
+		<qualifier value="someQualifierId">
+		</qualifier>
+	</bean>
+	
+	@Autowired
+	@Qualifier(value="someQualifierId")
+	public void setConsoleWriter(ConsoleWriter writer) {
+		this.consoleWriter = writer;
+	}
+
+===========================
+Qualifier Beans at class level @Qualifier(value="someQualifierId")
+===========================	
+Suppose Logger class is as below. The FileWriter takes Interface so causing ambiguity.:
+	private ConsoleWriter consoleWriter;
+	private ILogWriter fileWriter;
+	@Autowired
+	@Qualifier(value="someQualifierId")
+	public void setConsoleWriter(ConsoleWriter writer) {
+		this.consoleWriter = writer;
+	}
+	@Autowired
+	public void setFileWriter(ILogWriter fileWriter) {
+		this.fileWriter = fileWriter;
+	}
+
+There are three qualifying beans viz:
+	<bean id="fileWriterNameChangedSoThatAutowireByNameAlsoConfuses" class="FileWriter"></bean>
+	<bean id="consoleWriter" class="ConsoleWriter" init-method="anotherInit"></bean>
+	<bean id="consoleWriter1" class="ConsoleWriter" init-method="anotherInit">
+		<qualifier value="someQualifierId">
+		</qualifier>
+	</bean>	
+
+We saw adding qualifier in XML. However, we want setFileWriter to wire FileWriter class that implements ILogger and not ConsoleWriter that also implement the same interface.
+We can hence add a qualifier on :
+
+@Qualifier("someQualifierForFileWriter")
+public class FileWriter implements ILogWriter {
+
+	public void write(String text) {
+		System.out.println("Write to file: " + text);
+		
+	}
+
+and then we can add that qualifier on the setter that needs to resolve ambiguity:
+	@Autowired
+	@Qualifier("someQualifierForFileWriter")
+	public void setFileWriter(ILogWriter fileWriter) {
+		this.fileWriter = fileWriter;
+	}
+===========================
+@Resource
+===========================	
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+JSR 250 - 256 => @Resource implemented (can be used instead of autowire) => Java 1.6
+	@Resource(name="consoleWriter1") // if you don't write name=xxx, it will wire by name
+	// similar to @Autowired
+	public void setConsoleWriter(ConsoleWriter writer) {
+		this.consoleWriter = writer;
+	}
+
+===========================
+annotation based init and destroy
+===========================	
+@PostContruct
+@PreDestroy (like destroy method - scope should be default i.e. singleton
+===========================
+@Inject
+===========================	
+JSR 330
+Similar to Autowire
+@Inject
+or 
+@Inject(
+@Named(value="consoleWriter1")
+===========================
+automatic bean discovery
+===========================	
+1. Remove all bean definitation in beans.xml and add:
+	<context:component-scan base-package="com.nav.spring"></context:component-scan>
+	<context:annotation-config></context:annotation-config>
+2. The beans in our case are:
+    - Logger (which has setters for following beans)
+	- FileWriter
+	- ConsoleWriter
+3. Add @Component over all bean class def
+4. Add @Inject over setters of Logger class (You could also use @Autowired/@Resource as well)
+
+To remove ambiguity, 
+@Component("idForFileWriter")
+public class FileWriter(){...}
+public class Logger(){
+    private FileWriter fileWriter;
+	@Inject
+	@Named(value=""idForFileWriter")
+	public void setFileWriter(FileWriter fileWriter){..}

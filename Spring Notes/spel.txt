@@ -1,0 +1,65 @@
+public class RandomText {
+	
+	private static String[] texts = {
+		"I'll be back",
+		"Get out!",
+		"I want your clothes, boots and motorcycle.",
+		null
+	};
+	
+	public String getText() {
+		Random random = new Random();
+		
+		return texts[random.nextInt(texts.length)];
+	}
+}
+
+
+public class Robot {
+	
+	private String id = "Default robot";
+	private String speech = "hello";
+	
+	public void speak() {
+		System.out.println(id + ": " + speech);
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setSpeech(String speech) {
+		this.speech = speech;
+	}
+
+}
+
+
+	<bean id="robot" class="com.nav.spring.spel.Robot">
+		<property name="id" value="#{randomText.text?.length()}"></property> // getText() to text, ? for null
+		<property name="speech" value="#{'random text: ' + randomText.getText()}"></property>
+	</bean>
+
+	<bean id="randomText" class="com.nav.spring.spel.RandomText">
+	</bean>
+	
+===
+Annotations 
+===
+    @Autowired
+	public void setId(@Value("#{randomText.getText()?.length()}") String id) {
+		this.id = id;
+	}
+
+	@Autowired
+	public void setSpeech(@Value("#{randomText.getText()}") String speech) {
+		this.speech = speech;
+	}
+ or
+ 	@Autowired
+	// #{new java.util.Date().toString()}
+	public void setSpeech(@Value("#{T(Math).sin(T(Math).PI/4) ^ 2 le 0.8 ? 'yes':'no'}") String speech) {
+	// T to access static method. Surround class by T
+		this.speech = speech;
+	}
+	

@@ -1,0 +1,58 @@
+Say we have a Logger bean (has two properties .
+	private ConsoleWriter consoleWriter;
+	private FileWriter fileWriter;
+We want to wire FileWriter and ConsoleWriter (both implement ILogWriter).
+
+- We could either do with ref or inner beans
+===
+	<bean id="logger" class="Logger">
+		<property name="fileWriter" ref="fileWriter"/>
+		<property name="consoleWriter" ref="consoleWriter"/>
+	</bean>
+	<bean id="fileWriter" class="FileWriter"></bean>
+	<bean id="consoleWriter" class="ConsoleWriter"></bean>
+====
+	<bean id="logger" class="Logger">
+		<property name="fileWriter">
+			<bean id="fileWriter" class="FileWriter"></bean>
+		</property>
+		<property name="consoleWriter">
+			<bean id="consoleWriter" class="ConsoleWriter"></bean>
+		</property>
+	</bean>	
+===
+OR AUTOWIRE BY TYPE
+===
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-init-method="defaultInit">
+
+	<bean id="logger" class="Logger" autowire="byType">
+	</bean>
+
+	<bean id="fileWriter" class="FileWriter"></bean>
+	<bean id="consoleWriter" class="ConsoleWriter" init-method="anotherInit"></bean>
+</beans>
+=======
+AMBIGUITY - 1
+=======
+<bean id="fileWriter" class="FileWriter"></bean>
+<bean id="fileWriter2" class="FileWriter"></bean>
+NoUniqueBeanDefinitionException: No qualifying bean of type 'FileWriter' available: expected single matching bean but found 2: fileWriter,fileWriter2
+=======
+AMBIGUITY - 2
+=======
+change:
+Logger bean (has two properties):
+	private ConsoleWriter consoleWriter;
+	private FileWriter fileWriter;
+To
+	private ILogWriter consoleWriter;
+	private FileWriter fileWriter;
+and also change setter to take ILogWriter instead of consoleWriter
+
+	public void setConsoleWriter(ILogWriter writer) {
+		this.consoleWriter = writer;
+	}

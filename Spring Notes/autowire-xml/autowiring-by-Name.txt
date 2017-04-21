@@ -1,0 +1,24 @@
+In our logger class two beans that we want to wire have same type (as we have setters that accept common Interface
+
+public class Logger {
+	private ILogWriter consoleWriter;
+	private ILogWriter fileWriter;
+
+	public void setConsoleWriter(ILogWriter writer) {
+		this.consoleWriter = writer;
+	}
+
+	public void setFileWriter(ILogWriter fileWriter) {
+		this.fileWriter = fileWriter;
+	}
+}
+
+Hence, autowiring by type will fail.
+In such case you could autowire by name (match by id not name. see the camel case)
+Change fileWriter to FileWriter and see that in Logger bean setFileWriter setter will set null.
+
+	<bean id="logger" class="Logger" autowire="byName">
+	</bean>
+
+	<bean id="fileWriter" class="FileWriter"></bean>
+	<bean id="consoleWriter" class="ConsoleWriter" init-method="anotherInit"></bean>

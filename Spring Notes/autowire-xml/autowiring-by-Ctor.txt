@@ -1,0 +1,23 @@
+autodetect auto wiring is deprecated.
+autowiring by constructor works by type.
+
+However, I noticed that if ambiguity can't be resolved by type, but by name - spring does that 
+as in below case. Here booth fileWriter and consoleWriter are of type ILogger.
+
+
+private ILogWriter consoleWriter;
+private ILogWriter fileWriter;
+
+	public Logger(ILogWriter consoleWriter,
+			ILogWriter fileWriter) {
+		this.consoleWriter = consoleWriter;
+		this.fileWriter = fileWriter;
+	}
+
+
+	<bean id="logger" class="Logger" autowire="constructor">
+	</bean>
+
+	<bean id="fileWriter" class="FileWriter"></bean>
+	<bean id="consoleWriter" class="ConsoleWriter" init-method="anotherInit"></bean>
+

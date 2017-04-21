@@ -1,0 +1,142 @@
+
+	<bean id="basket" class="com.nav.spring.FruitBasket">
+		<constructor-arg value="John's basket"></constructor-arg>
+		<constructor-arg>
+			<list>
+				<value>apple</value>
+				<value>banana</value>
+				<value>orange</value>
+				<value>kiwi</value>
+				<value>pear</value>
+				<value>orange</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	===
+	
+	public class FruitBasket {
+	private String name;
+	private List<String> fruits;
+	
+	public FruitBasket(String name, List<String> fruits) {
+		this.name = name;
+		this.fruits = fruits;
+	}
+	
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(name);
+		sb.append(" contains:\n");
+		
+		for(String fruit: fruits) {
+			sb.append(fruit);
+			sb.append("\n");
+		}
+		
+		return sb.toString();
+	}
+}
+========================================
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="jungle" class="com.nav.spring.Jungle">
+
+		<property name="largest" ref="elephant"></property>
+		<property name="animals">
+			<list>
+				<ref bean="snake" />
+				<ref bean="elephant" />
+				<ref bean="lion" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="lion" class="com.nav.spring.Animal">
+		<property name="name" value="Igor"></property>
+		<property name="type" value="lion"></property>
+	</bean>
+	<bean id="elephant" class="com.nav.spring.Animal">
+		<property name="name" value="Richard"></property>
+		<property name="type" value="elephant"></property>
+	</bean>
+	<bean id="snake" class="com.nav.spring.Animal">
+		<property name="name" value="Bob"></property>
+		<property name="type" value="snake"></property>
+	</bean>
+</beans>
+
+
+public class Jungle {
+	private Animal largest;
+	private List<Animal> animals;
+
+	public Animal getLargest() {
+		return largest;
+	}
+
+	public void setLargest(Animal largest) {
+		this.largest = largest;
+	}
+
+	public List<Animal> getAnimals() {
+		return animals;
+	}
+
+	public void setAnimals(List<Animal> animals) {
+		this.animals = animals;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Largest: " + largest);
+		sb.append("\n");
+		sb.append("Others:\n");
+		
+		for(Animal animal: animals) {
+			sb.append(animal);
+			sb.append("\n");
+		}
+		
+		return sb.toString();
+	}
+}
+==============
+INNER BEANS
+=============
+
+
+
+	<bean id="jungle" class="com.nav.spring.Jungle">
+
+		<property name="largest">
+			<bean class="com.nav.spring.Animal">
+				<property name="name" value="Richard"></property>
+				<property name="type" value="elephant"></property>
+			</bean>
+		</property>
+		<property name="animals">
+			<list>
+				<bean class="com.nav.spring.Animal">
+					<property name="name" value="Igor"></property>
+					<property name="type" value="lion"></property>
+				</bean>
+				<bean class="com.nav.spring.Animal">
+					<property name="name" value="Richard"></property>
+					<property name="type" value="elephant"></property>
+				</bean>
+				<bean class="com.nav.spring.Animal">
+					<property name="name" value="Bob"></property>
+					<property name="type" value="snake"></property>
+				</bean>
+			</list>
+		</property>
+	</bean>

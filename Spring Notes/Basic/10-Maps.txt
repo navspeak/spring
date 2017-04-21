@@ -1,0 +1,51 @@
+public class Jungle {
+	
+	private Map<String, String> foods = new HashMap<String, String>();
+	private Map<String, Animal> animals = new HashMap<String, Animal>();
+	
+	public void setFoods(Map<String, String> foods) {
+		this.foods = foods;
+	}
+
+	public void setAnimals(Map<String, Animal> animals) {
+		this.animals = animals;
+	}
+
+	@Override
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for(Map.Entry<String, String> entry: foods.entrySet()) {
+			sb.append(entry.getKey() + ": " + entry.getValue() + "\n");
+		}
+		
+		return sb.toString();
+	}
+}
+	<bean id="lion" class="com.caveofprogramming.spring.test.Animal">
+		<property name="name" value="Igor"></property>
+		<property name="type" value="lion"></property>
+	</bean>
+	<bean id="elephant" class="com.caveofprogramming.spring.test.Animal">
+		<property name="name" value="Richard"></property>
+		<property name="type" value="elephant"></property>
+	</bean>
+	<bean id="snake" class="com.caveofprogramming.spring.test.Animal">
+		<property name="name" value="Bob"></property>
+		<property name="type" value="snake"></property>
+	</bean>
+
+	<bean id="jungle"
+		class="com.caveofprogramming.spring.test.Jungle">
+
+		<property name="foods">
+			<props>
+				<prop key="gorilla">banana</prop>
+				<prop key="panda">bamboo</prop>
+				<prop key="snake">eggs</prop>
+			</props>
+		</property>
+		
+	</bean>
+====

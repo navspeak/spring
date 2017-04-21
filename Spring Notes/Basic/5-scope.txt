@@ -1,0 +1,83 @@
+package com.nav.spring;
+public class Person {
+	
+	private int id;
+	private String name;
+	private int taxId;
+	private Address address;
+	
+	public Person() {
+		
+	}
+	
+	public Person(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
+
+	public void setTaxId(int taxId) {
+		this.taxId = taxId;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	@Override
+	public String toString() {
+		return "Person [id=" + id + ", name=" + name + ", taxId=" + taxId
+				+ ", address=" + address + "]";
+	}
+	
+	public void speak() {
+		System.out.println("Hello! I'm a person.");
+	}
+}
+====
+public class Address {
+	private String street;
+	private String postcode;
+	
+	public Address(String street, String postcode) {
+		this.street = street;
+		this.postcode = postcode;
+	}
+
+	@Override
+	public String toString() {
+		return "Address [street=" + street + ", postcode=" + postcode + "]";
+	}
+	
+}
+===
+
+	<bean id="person"
+		class="com.nav.spring.Person" scope="prototype">
+		<constructor-arg value="777" name="id" type="int">
+		</constructor-arg>
+		<constructor-arg value="Mary" name="name" type="String"></constructor-arg>
+		<property value="321" name="taxId">
+		</property>
+		<property name="address" ref="address"></property>
+	</bean>
+
+	<bean id="address" class="com.nav.spring.Address">
+		<constructor-arg name="street" value="1 Church Lane"></constructor-arg>
+		<constructor-arg name="postcode" value="9876"></constructor-arg>
+	</bean>
+===
+	public static void main(String[] args) {
+		
+		ApplicationContext context = new ClassPathXmlApplicationContext("com/caveofprogramming/spring/test/beans/beans.xml");
+		
+		Person person1 = (Person)context.getBean("person");
+		Person person2 = (Person)context.getBean("person");
+		
+		person1.setTaxId(666);
+
+		System.out.println(person2);
+		
+		((ClassPathXmlApplicationContext)context).close();
+	}
+=========

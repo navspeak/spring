@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-init-method="defaultInit" default-autowire="byName">
+
+	<bean id="logger" class="Logger" autowire="constructor">
+	</bean>
+
+	<bean id="fileWriter" class="FileWriter"></bean>
+	<bean id="consoleWriter" class="ConsoleWriter" init-method="anotherInit"></bean>
+
+
+</beans>
+
+We can also give autowire candidates. Like here we have auto-wire by type and 2 fileWriter
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-init-method="defaultInit" default-autowire="byType" default-autowire-candidates="fileWriter1,consoleWrite"> //We can also use wild card like *file
+
+	<bean id="logger" class="Logger" autowire="constructor">
+	</bean>
+
+	<bean id="fileWriter" class="FileWriter"></bean>
+	<bean id="fileWriter1" class="FileWriter"></bean>
+	<bean id="fileWriter2" class="FileWriter"></bean>
+	<bean id="consoleWriter" class="ConsoleWriter" init-method="anotherInit"></bean>
+</beans>
+
+===
+Removing ambiguity
+====
