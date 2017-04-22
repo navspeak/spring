@@ -1,0 +1,61 @@
+JDBC allows queries very easily
+=========
+Offers Table
+==============
+id	- int(11)	NO	PRI		auto_increment
+name -	varchar(100)	NO			
+email -	varchar(60)	NO			
+text - text	NO		
+
+public class Offer {
+	private int id;
+	private String name;
+	private String email;
+	private String text;
+    //getters and setters
+}
+
+@Component("OffersDAO")
+public class OffersDAO {
+	
+	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired//@Inject
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	public List<Offer> getOffers() {
+		List<Offer> offers = jdbcTemplate.query("select * from offers", new RowMapper<Offer>(){
+			public Offer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Offer offer = new Offer();
+				offer.setId(rs.getInt("id"));
+				offer.setName(rs.getString("name"));
+				offer.setEmail(rs.getString("email"));
+				offer.setText(rs.getString("text"));
+				return offer;	
+			}});
+		return offers;
+	}
+}
+
+====
+
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("com/nav/spring/spel/beans.xml");
+		
+		OffersDAO offersDAO = (OffersDAO)context.getBean("OffersDAO");
+		
+		try {
+				for (Offer offer : offersDAO.getOffers()) {
+				System.out.println(offer);
+			}
+		} 
+		catch(CannotGetJdbcConnectionException ex) { 
+			System.out.println("Cannot get database connection.");
+		}
+		catch (DataAccessException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println(ex.getClass());
+		}
+		
+		context.close();

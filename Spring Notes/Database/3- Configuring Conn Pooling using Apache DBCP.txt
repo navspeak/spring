@@ -1,0 +1,30 @@
+jdbc.properties:
+=================
+jdbc.username = root
+jdbc.password = letmein
+jdbc.driver = com.mysql.jdbc.Driver
+jdbc.url = jdbc:mysql://localhost:3306/springtutorial
+
+pom.xml
+=====
+  	<dependency>
+  		<groupId>commons-dbcp</groupId>
+  		<artifactId>commons-dbcp</artifactId>
+  		<version>1.4</version>
+  	</dependency>
+
+
+beans.xml
+==================	
+	<context:annotation-config></context:annotation-config>
+	<context:component-scan base-package="com.nav.spring.spel"></context:component-scan>
+	<context:property-placeholder location="com/nav/spring/spel/jdbc.properties" />	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+	</bean>
+
+If you use a web project, you won't need to do this as ur appserver will have configuration for this.

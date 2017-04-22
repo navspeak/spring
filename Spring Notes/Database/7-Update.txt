@@ -1,0 +1,12 @@
+	public int delete(int id){
+		MapSqlParameterSource params = new MapSqlParameterSource("id", id);
+		//jdbcTemplate.getJdbcOperations().update("delete from offers")''
+		return jdbcTemplate.update("delete from offers where id = :id", params);
+	}
+
+INSERT
+// Use BeanPropertySqlParameterSource to have property placeholder from bean
+	public int create(Offer offer){
+		BeanPropertySqlParameterSource params = new BeanPropertySqlParameterSource(offer);
+		return jdbcTemplate.update("insert into offers (name, text, email) values (:name, :text, :email)", params);
+	}

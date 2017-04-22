@@ -1,0 +1,69 @@
+
+	public List<Offer> getOffers() {
+		List<Offer> offers = jdbcTemplate.query("select * from offers", new RowMapper<Offer>(){
+			public Offer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Offer offer = new Offer();
+				offer.setId(rs.getInt("id"));
+				offer.setName(rs.getString("name"));
+				offer.setEmail(rs.getString("email"));
+				offer.setText(rs.getString("text"));
+				return offer;	
+			}});
+		return offers;
+	}
+}
+
+we could have jdbc.query("select * from offers where id = 1" , new RowMapper<Offer>...);
+we don't want overhead of preparing a query all time
+Also for web form, we dont want to concatenate data from form which may have drop table kind of malicious statement.
+In JDBC we have ? for place holder = :name
+In spring - NamedParameterJdbcTemplate instead of JdbcTemplate
+query("select...", MapSqlParameterSource param, RowMapper) -> dataset
+queryForObject(...) -> one Object
+
+
+@Component("OffersDAO")
+public class OffersDAO {
+	
+	//private JdbcTemplate jdbcTemplate;
+	private NamedParameterJdbcTemplate jdbcTemplate;
+	
+	@Autowired//@Inject
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+	}
+
+	// ALL Offers
+	public List<Offer> getOffers() {
+		// MapSqlParameterSource params = new MapSqlParameterSource("name", "Navneet");
+		//MapSqlParameterSource params = new MapSqlParameterSource();
+		//params.addValue("name", "Navneet");
+		List<Offer> offers = jdbcTemplate.query("select * from offers ",  new RowMapper<Offer>(){
+			public Offer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Offer offer = new Offer();
+				offer.setId(rs.getInt("id"));
+				offer.setName(rs.getString("name"));
+				offer.setEmail(rs.getString("email"));
+				offer.setText(rs.getString("text"));
+				return offer;	
+			}});
+		return offers;
+	}
+	
+	    //One offer
+		public Offer getOffer(int id) {
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("id", id);
+		Offer offer = jdbcTemplate.queryForObject("select * from offers where id = :id",params,  new RowMapper<Offer>(){
+			public Offer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Offer offer = new Offer();
+				offer.setId(rs.getInt("id"));
+				offer.setName(rs.getString("name"));
+				offer.setEmail(rs.getString("email"));
+				offer.setText(rs.getString("text"));
+				return offer;	
+			}});
+		return offer;
+	}
+}
+

@@ -1,0 +1,53 @@
+JDBC allows queries very easily
+=========
+Offers Table
+==============
+id	- int(11)	NO	PRI		auto_increment
+name -	varchar(100)	NO			
+email -	varchar(60)	NO			
+text - text	NO		
+
+public class Offer {
+	private int id;
+	private String name;
+	private String email;
+	private String text;
+    //getters and setters
+}
+
+@Component
+public class OffersDAO {
+	
+	private JdbcTemplate jdbcTemplate;
+	
+	@Inject
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	public List<Offer> getOffers() {
+		return null;
+	}
+}
+
+Bean.xml:
+===========
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+</bean>
+
+Should be wired to OffersDAO.
+Thus OffersDAO must have a 
+	private JdbcTemplate jdbcTemplate;
+	
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-jdbc</artifactId>
+    <version>4.3.8.RELEASE</version>
+</dependency>
+
+	
