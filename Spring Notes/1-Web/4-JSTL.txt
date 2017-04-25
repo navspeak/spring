@@ -1,0 +1,37 @@
+Controller class:
+---------------------
+
+@Controller
+public class OffersController {
+	
+	@RequestMapping("/")
+	public String showHome(){
+		return "home";
+	}
+
+}
+
+home.jsp
+-------------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+ <h1>Hello!</h1>
+</body>
+</html>
+
+Question - how do we pass data from controller to view?
+========================================================
+(*) when jsp pages were initially created the thinking was that jsp will have embedded java. 
+(*) But that's bad as that mixes logic with view
+(*) However just to under the concept, we will embed java using expression tag
+<body>
+ <h2>Hello There!</h2>
+ <p> Session : <%= session.getAttribute("name") %> </p>
+</body>
