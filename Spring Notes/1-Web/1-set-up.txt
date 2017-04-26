@@ -17,13 +17,29 @@ Add Controllers
 8. Enable mvc & context namespace
 	<context:component-scan base-package="controllers"></context:component-scan>
 	<mvc:annotation-driven></mvc:annotation-driven>
+9. Controller class
+package com.nav.web.controllers;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class OffersController {
+	
+	@RequestMapping("/")
+	public String showHome(){
+		return "home";
+	}
+
+}
+
 ======
 Add View Resolvers 
 =======
 9. Add a folder named jsps in WEB-INF and add a home.jsp 
 10. In spring-mvc jar you will find org.springframework.web.servlet.view.InternalResourceViewResolver
 11. Copy that and add following bean:
-	<bean id="jspViewResolver"
+	<bean id="ViewResolver" //When I named it jspViewResolver - it didn't work
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/jsps/"></property>
 		<property name="suffix" value=".jsp"></property>

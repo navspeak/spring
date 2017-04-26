@@ -1,0 +1,7 @@
+com\nav\web\dao\Offer.class
+com\nav\web\controllers\OffersController.class
+com\nav\web\service\OffersService.class
+com\nav\web\dao\OffersDAO.class
+com\nav\web\dao\OffersDAO$2.class
+com\nav\web\dao\App.class
+com\nav\web\dao\OffersDAO$1.class

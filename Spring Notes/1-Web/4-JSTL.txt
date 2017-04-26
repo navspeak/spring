@@ -1,20 +1,23 @@
-Controller class:
----------------------
+Add jstl tag-lib
+http://docs.oracle.com/javaee/5/jstl/1.1/docs/tlddocs/c/tld-summary.html
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> in home.jsp
 
-@Controller
-public class OffersController {
-	
-	@RequestMapping("/")
-	public String showHome(){
-		return "home";
-	}
+pom.xml
+==============
+<dependency>
+    <groupId>jstl</groupId>
+    <artifactId>jstl</artifactId>
+    <version>1.2</version>
+</dependency>
 
-}
 
-home.jsp
--------------
+Refer http://docs.oracle.com/javaee/5/jstl/1.1/docs/tlddocs/c/tld-summary.html for 
+We will use:
+out	- Like <%= ... >, but for expressions.- escapes any special character like <b>
+===
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -22,16 +25,8 @@ home.jsp
 <title>Insert title here</title>
 </head>
 <body>
- <h1>Hello!</h1>
+	<h2>Hello There!</h2>
+	<p><c:out value="${name }"></c:out> </p>
 </body>
 </html>
-
-Question - how do we pass data from controller to view?
-========================================================
-(*) when jsp pages were initially created the thinking was that jsp will have embedded java. 
-(*) But that's bad as that mixes logic with view
-(*) However just to under the concept, we will embed java using expression tag
-<body>
- <h2>Hello There!</h2>
- <p> Session : <%= session.getAttribute("name") %> </p>
-</body>
+===

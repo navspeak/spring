@@ -1,0 +1,129 @@
+You first need to create a dataSource Bean.
+
+In normal Java app, you would add it as a bean in beans.xml:
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+	</bean>
+
+Tomcat can create this bean and put it in JNDI, so you don't need to add it in spring config file:
+Goto $CATALINA_BASE/conf/context.xml
+For HSQL:
+=========
+	      <Resource name="jdbc/HSQLOfferDB"
+            auth="Container"
+            type="javax.sql.DataSource"
+            username="sa"
+            password=""
+            driverClassName="org.hsqldb.jdbcDriver"
+            url="jdbc:hsqldb:mem:testdb"
+            maxTotal="8"
+            maxIdle="4"/>
+(You will also need to copy the hsqldb.jar in Tomcat's lib directory)
+For mySQL:
+==========
+        
+  <Resource name="jdbc/MySQLOfferDB" auth="Container" type="javax.sql.DataSource"
+               maxActive="100" maxIdle="30" maxWait="10000"
+               username="root" password="root" driverClassName="com.mysql.jdbc.Driver"
+               url="jdbc:mysql://localhost:3306/springtutorial"/>
+
+Go to Web.xml of you webapp and add resource-ref:
+==============================
+	<description>MySQL</description>
+	<resource-ref>
+		<description>MySQL DB Connection</description>
+		<res-ref-name>jdbc/MySQLOfferDB</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+	<description>MySQL Test App</description>
+	<resource-ref>
+		<description>HSQL DB Connection</description>
+		<res-ref-name>jdbc/HSQLOfferDB</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+	
+In your spring config file (offers-servlet.xml)
+==============================================
+	<context:component-scan base-package="com.nav.web.controllers">
+	</context:component-scan>
+	<mvc:annotation-driven></mvc:annotation-driven>
+	<jee:jndi-lookup id="dataSource" jndi-name="jdbc/HSQLOfferDB" />
+	<jdbc:initialize-database data-source="dataSource">
+		<jdbc:script location="WEB-INF/db/create-table.sql" />
+		<jdbc:script location="WEB-INF/db/insert.sql" />
+	</jdbc:initialize-database>
+
+	<bean id="ViewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsps/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+
+You can actually take all the dataSource related stuff in an xml file of its own say dao-context.xml 
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+	<context:annotation-config></context:annotation-config>
+	<context:component-scan base-package="com.nav.spring.config"></context:component-scan>
+	<jee:jndi-lookup jndi-name="jdbc/HSQLOfferDB" id="dataSource"></jee:jndi-lookup>
+	<mvc:annotation-driven></mvc:annotation-driven>
+	<jee:jndi-lookup id="dataSource" jndi-name="jdbc/HSQLOfferDB" />
+	<jdbc:initialize-database data-source="dataSource">
+		<jdbc:script location="WEB-INF/db/create-table.sql" />
+		<jdbc:script location="WEB-INF/db/insert.sql" />
+	</jdbc:initialize-database>
+</beans>
+
+and in web.xml of the webapp add a listener:
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+		classpath:com/nav/spring/config/dao-context.xml
+		</param-value>
+	</context-param>
+
+Your JSP page:
+==============
+(search Tomcat JNDI mysql)
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>Hello There!</h2>
+	<sql:query var="rs" dataSource="jdbc/HSQLOfferDB">
+		select id,name, email, text from offers
+	</sql:query>
+	<c:forEach var="row" items="${rs.rows}">
+    Id  ${row.id}<br/>
+    name ${row.name}<br/>
+</c:forEach>
+</body>
+</html>
